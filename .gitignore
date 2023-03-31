@@ -50,3 +50,4 @@ mvnw
 mvnw.cmd
 *.DS_Store
 .properties
+target/
