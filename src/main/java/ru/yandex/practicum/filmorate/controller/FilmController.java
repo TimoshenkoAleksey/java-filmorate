@@ -25,13 +25,13 @@ public class FilmController {
 
     @PostMapping
     public Film create(@RequestBody Film film) {
-        if(film.getName() == null || film.getName().isBlank()) {
+        if (film.getName() == null || film.getName().isBlank()) {
             log.error("Название фильма пусто.");
             throw new ValidationException("Название фильма не может быть пустым.");
         } else if (film.getDescription().length() > 200) {
             log.error("Превышена максимальная длина описания.");
             throw new ValidationException("Максимальная длина описания — 200 символов.");
-        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
+        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.error("Дата релиза фильма оказалась ранее 28 декабря 1895 года.");
             throw new ValidationException("Дата релиза фильма не может быть ранее 28 декабря 1895 года.");
         } else if (film.getDuration() < 0) {
@@ -47,7 +47,7 @@ public class FilmController {
 
     @PutMapping
     public Film put(@RequestBody Film film) {
-        if(film.getName() == null || film.getName().isBlank()) {
+        if (film.getName() == null || film.getName().isBlank()) {
             log.error("Название фильма пусто.");
             throw new ValidationException("Название фильма не может быть пустым.");
         }
@@ -55,7 +55,7 @@ public class FilmController {
             log.error("Превышена максимальная длина описания.");
             throw new ValidationException("Максимальная длина описания — 200 символов.");
         }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895,12,28))) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.error("Дата релиза фильма оказалась ранее 28 декабря 1895 года.");
             throw new ValidationException("Дата релиза фильма не может быть ранее 28 декабря 1895 года.");
         }
