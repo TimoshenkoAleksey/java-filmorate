@@ -29,7 +29,7 @@ public class UserController {
             user.setName(user.getLogin());
         }
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            log.error("Электронная почта пуста или не содержать символ @");
+            log.error("Электронная почта пуста или не содержать символа @");
             throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @.");
         } else if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
             log.error("Логин пустой или содержит пробелы");
