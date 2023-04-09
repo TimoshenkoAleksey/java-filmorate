@@ -15,8 +15,8 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
 
-    private final Map<Integer, User> users = new HashMap<>();
-    private int idGenerator = 1;
+    private final Map<Long, User> users = new HashMap<>();
+    private long idGenerator = 1;
 
     @GetMapping
     public Collection<User> findAll() {

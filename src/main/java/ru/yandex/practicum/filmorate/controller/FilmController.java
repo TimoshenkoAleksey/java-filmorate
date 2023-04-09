@@ -15,8 +15,8 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
 
-    private final Map<Integer, Film> films = new HashMap<>();
-    private int idGenerate = 1;
+    private final Map<Long, Film> films = new HashMap<>();
+    private long idGenerate = 1;
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -50,20 +50,16 @@ public class FilmController {
         if (film.getName() == null || film.getName().isBlank()) {
             log.error("Название фильма пусто.");
             throw new ValidationException("Название фильма не может быть пустым.");
-        }
-        if (film.getDescription().length() > 200) {
+        } else if (film.getDescription().length() > 200) {
             log.error("Превышена максимальная длина описания.");
             throw new ValidationException("Максимальная длина описания — 200 символов.");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+        } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.error("Дата релиза фильма оказалась ранее 28 декабря 1895 года.");
             throw new ValidationException("Дата релиза фильма не может быть ранее 28 декабря 1895 года.");
-        }
-        if (film.getDuration() < 0) {
+        } else if (film.getDuration() < 0) {
             log.error("Продолжительность фильма отрицательная.");
             throw new ValidationException("Продолжительность фильма должна быть положительной.");
-        }
-        if (!films.containsKey(film.getId())) {
+        } else if (!films.containsKey(film.getId())) {
             log.error("Нельзя обновить: фильм с id {} нет в базе данных", film.getId());
             throw new ValidationException("Фильма нет в базе данных.");
         } else {
