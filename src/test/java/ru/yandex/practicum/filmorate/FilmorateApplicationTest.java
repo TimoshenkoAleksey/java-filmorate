@@ -133,7 +133,7 @@ class FilmorateApplicationTest {
                 .build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            assertEquals(500, response.statusCode());
+            assertEquals(400, response.statusCode());
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -272,7 +272,7 @@ class FilmorateApplicationTest {
                 .build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            assertEquals(500, response.statusCode());
+            assertEquals(400, response.statusCode());
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
