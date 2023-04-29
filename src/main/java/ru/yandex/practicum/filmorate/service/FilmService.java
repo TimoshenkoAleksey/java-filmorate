@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -7,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 
 @Service
+@Slf4j
 public class FilmService {
 
     private final UserStorage userStorage;
@@ -37,10 +40,18 @@ public class FilmService {
     }
 
     public Film addFilm(Film film) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            log.error("Дата релиза фильма оказалась ранее 28 декабря 1895 года.");
+            throw new ValidationException("Дата релиза фильма не может быть ранее 28 декабря 1895 года.");
+        }
         return filmStorage.add(film);
     }
 
     public Film updateFilm(Film film) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            log.error("Дата релиза фильма оказалась ранее 28 декабря 1895 года.");
+            throw new ValidationException("Дата релиза фильма не может быть ранее 28 декабря 1895 года.");
+        }
         return filmStorage.update(film);
     }
 
@@ -66,20 +77,14 @@ public class FilmService {
         return filmStorage.getFilms().get(idFilm);
     }
 
-    public List<Film> popular(String count) {
-        int defaultCount = 10;
-        if (count == null) {
-            return filmStorage.getFilms().values().stream()
-                    .sorted((o1, o2) -> Integer.compare(o2.getLikes().size(), o1.getLikes().size()))
-                    .limit(defaultCount)
-                    .collect(Collectors.toList());
-        } else if (Integer.parseInt(count) <= 0) {
-            throw new ValidationException("Параметр количества фильмов меньше или равны нулю: count = " + count);
-        } else {
-            return filmStorage.getFilms().values().stream()
-                    .sorted((o1, o2) -> Integer.compare(o2.getLikes().size(), o1.getLikes().size()))
-                    .limit(Integer.parseInt(count))
-                    .collect(Collectors.toList());
+    public List<Film> popular(int count) {
+        if (count <= 0) {
+            log.error("popular: Параметр количества фильмов меньше или равен нулю.");
+            throw new ValidationException("Параметр количества фильмов меньше или равен нулю: count = " + count);
         }
+        return filmStorage.getFilms().values().stream()
+                .sorted((o1, o2) -> Integer.compare(o2.getLikes().size(), o1.getLikes().size()))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 }

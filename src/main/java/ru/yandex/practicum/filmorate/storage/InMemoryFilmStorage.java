@@ -18,23 +18,15 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film add(Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.error("Дата релиза фильма оказалась ранее 28 декабря 1895 года.");
-            throw new ValidationException("Дата релиза фильма не может быть ранее 28 декабря 1895 года.");
-        } else {
-            film.setId(idGenerate++);
-            films.put(film.getId(), film);
-            log.info("Добавлен фильм {}", film.getName());
-        }
+        film.setId(idGenerate++);
+        films.put(film.getId(), film);
+        log.info("Добавлен фильм {}", film.getName());
         return film;
     }
 
     @Override
     public Film update(Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.error("Дата релиза фильма оказалась ранее 28 декабря 1895 года.");
-            throw new ValidationException("Дата релиза фильма не может быть ранее 28 декабря 1895 года.");
-        } else if (!films.containsKey(film.getId())) {
+        if (!films.containsKey(film.getId())) {
             log.error("Нельзя обновить: фильма с id {} нет в базе данных", film.getId());
             throw new NullPointerException("Фильма нет в базе данных.");
         } else {

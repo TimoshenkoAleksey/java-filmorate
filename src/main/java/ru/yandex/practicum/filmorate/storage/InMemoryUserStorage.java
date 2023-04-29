@@ -18,29 +18,15 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User add(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Дата рождения {}", user.getBirthday());
-            throw new ValidationException("Дата рождения не может быть в будущем.");
-        } else {
-            user.setId(idGenerator++);
-            users.put(user.getId(), user);
-            log.info("Добавлен пользователь {}", user.getName());
-        }
+        user.setId(idGenerator++);
+        users.put(user.getId(), user);
+        log.info("Добавлен пользователь {}", user.getName());
         return user;
     }
 
     @Override
     public User update(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Дата рождения {}", user.getBirthday());
-            throw new NullPointerException("Дата рождения не может быть в будущем.");
-        } else if (!users.containsKey(user.getId())) {
+        if (!users.containsKey(user.getId())) {
             log.error("Нельзя обновить: пользователя с id {} нет в базе данных", user.getId());
             throw new NullPointerException("Пользователя нет в базе данных.");
         } else {
