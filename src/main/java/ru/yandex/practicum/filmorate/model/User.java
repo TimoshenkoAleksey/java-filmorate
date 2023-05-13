@@ -19,7 +19,7 @@ public class User {
     private String login;
     private String name;
     @NotNull
-    @Past
+    @PastOrPresent
     private LocalDate birthday;
     private final Set<Long> friends = new HashSet<>();
 }

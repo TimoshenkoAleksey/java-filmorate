@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -38,7 +39,12 @@ public class LikesDbStorage {
 
     public List<Long> getFilmLikes(long filmId) {
         String sql = "SELECT user_id FROM Likes WHERE film_id = ?";
-        return jdbcTemplate.query(sql, (rs, rowNun) -> rs.getLong("user_id"), filmId);
+        try {
+            return jdbcTemplate.query(sql, (rs, rowNun) -> rs.getLong("user_id"), filmId);
+        } catch (EmptyResultDataAccessException e) {
+            log.debug("Фильма с id={} нет в базе", filmId);
+            throw new NullPointerException(format("Фильма с id= %s нет в базе", filmId));
+        }
     }
 
     public List<Film> getPopularFilms(int count) {

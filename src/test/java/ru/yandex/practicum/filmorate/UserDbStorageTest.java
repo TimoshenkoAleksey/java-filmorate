@@ -13,8 +13,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -94,7 +94,7 @@ class UserDbStorageTest {
     void shouldUpdateUserWithId() {
         User userForTest = createTestUser();
         userStorage.addUser(userForTest);
-        User forUpdate  = userForUpdate();
+        User forUpdate = userForUpdate();
         userStorage.updateUser(forUpdate);
         Optional<User> updateUser = Optional.ofNullable(userStorage.getUserById(1));
 
@@ -109,7 +109,7 @@ class UserDbStorageTest {
     void shouldUpdateUserWithEmail() {
         User userForTest = createTestUser();
         userStorage.addUser(userForTest);
-        User forUpdate  = userForUpdate();
+        User forUpdate = userForUpdate();
         userStorage.updateUser(forUpdate);
         Optional<User> updateUser = Optional.ofNullable(userStorage.getUserById(1));
 
@@ -124,7 +124,7 @@ class UserDbStorageTest {
     void shouldUpdatedUserByLogin() {
         User userForTest = createTestUser();
         userStorage.addUser(userForTest);
-        User forUpdate  = userForUpdate();
+        User forUpdate = userForUpdate();
         userStorage.updateUser(forUpdate);
         Optional<User> updateUser = Optional.ofNullable(userStorage.getUserById(1));
 
@@ -139,7 +139,7 @@ class UserDbStorageTest {
     void shouldUpdateUserWithName() {
         User userForTest = createTestUser();
         userStorage.addUser(userForTest);
-        User forUpdate  = userForUpdate();
+        User forUpdate = userForUpdate();
         userStorage.updateUser(forUpdate);
         Optional<User> updateUser = Optional.ofNullable(userStorage.getUserById(1));
 
@@ -154,7 +154,7 @@ class UserDbStorageTest {
     void shouldUpdateUserWithBirthday() {
         User userForTest = createTestUser();
         userStorage.addUser(userForTest);
-        User forUpdate  = userForUpdate();
+        User forUpdate = userForUpdate();
         userStorage.updateUser(forUpdate);
         Optional<User> updateUser = Optional.ofNullable(userStorage.getUserById(1));
 

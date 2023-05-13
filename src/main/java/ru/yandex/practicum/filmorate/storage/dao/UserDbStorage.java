@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -14,6 +15,8 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Objects;
+
+import static java.lang.String.format;
 
 @Component
 public class UserDbStorage implements UserStorage {
@@ -43,8 +46,12 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        jdbcTemplate.update("UPDATE users SET email=?, login=?, name=?, birthday=? WHERE user_id=?",
-                user.getEmail(), user.getLogin(), user.getName(), Date.valueOf(user.getBirthday()), user.getId());
+        try {
+            jdbcTemplate.update("UPDATE users SET email=?, login=?, name=?, birthday=? WHERE user_id=?",
+                    user.getEmail(), user.getLogin(), user.getName(), Date.valueOf(user.getBirthday()), user.getId());
+        } catch (EmptyResultDataAccessException e) {
+            throw new NullPointerException(format("Пользователя с id= %s нет в базе", user.getId()));
+        }
         return user;
     }
 
@@ -56,6 +63,10 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUserById(long id) {
         String sql = "SELECT * FROM Users WHERE user_id = ?";
-        return jdbcTemplate.queryForObject(sql, new UserMapper(), id);
+        try {
+            return jdbcTemplate.queryForObject(sql, new UserMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NullPointerException(format("Пользователя с id= %s нет в базе", id));
+        }
     }
 }

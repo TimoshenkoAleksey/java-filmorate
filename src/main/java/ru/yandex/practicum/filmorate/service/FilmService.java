@@ -2,12 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.dao.LikesDbStorage;
 
 import java.time.LocalDate;
@@ -22,7 +20,6 @@ import static java.lang.String.format;
 public class FilmService {
 
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
     private final LikesDbStorage likesDbStorage;
     private static final LocalDate FIRST_FILM_RELEASE = LocalDate.of(1895, 12, 28);
 
@@ -34,12 +31,9 @@ public class FilmService {
 
     public Film getFilmById(long filmId) {
         Film film;
-        try {
-            film = filmStorage.getFilmById(filmId);
-        } catch (EmptyResultDataAccessException e) {
-            log.debug("Фильма с id={} нет в базе", filmId);
-            throw new NullPointerException(format("Фильма с id= %s нет в базе", filmId));
-        }
+        film = filmStorage.getFilmById(filmId);
+        film.getGenres().addAll(filmStorage.getGenreByFilmId(filmId));
+        film.getLikes().addAll(likesDbStorage.getFilmLikes(filmId));
         log.info("Получили фильм по id={}", filmId);
         return film;
     }
@@ -59,14 +53,13 @@ public class FilmService {
 
     public void addLikes(long filmId, long userId) {
         validateFilmById(filmId);
-        validateUserById(userId);
         log.info("Пользователь id={} поставил лайк фильму id={}", userId, filmId);
         likesDbStorage.addLikeToFilm(filmId, userId);
     }
 
     public void deleteLikes(long filmId, long userId) {
         validateFilmById(filmId);
-        validateUserById(userId);
+        validateFilmById(userId);
         log.info("Пользователь id = {} удалил лайк у фильма id = {}", userId, filmId);
         likesDbStorage.deleteLikeFromFilm(filmId, userId);
     }
@@ -80,25 +73,7 @@ public class FilmService {
     }
 
     private void validateFilmById(long filmId) {
-        try {
-            if (filmStorage.getFilmById(filmId) == null) {
-                log.error("Фильма с id={} нет в базе", filmId);
-                throw new NullPointerException(format("Фильса с id= %s нет в базе", filmId));
-            }
-        } catch (EmptyResultDataAccessException e) {
-            throw new NullPointerException(format("Фильса с id= %s нет в базе", filmId));
-        }
-    }
-
-    private void validateUserById(long userId) {
-        try {
-            if (userStorage.getUserById(userId) == null) {
-                log.error("Пользователя с id={} нет в базе", userId);
-                throw new NullPointerException(format("Пользователя с id= %s нет в базе", userId));
-            }
-        } catch (EmptyResultDataAccessException e) {
-            throw new NullPointerException(format("Пользователя с id= %s нет в базе", userId));
-        }
+        filmStorage.getFilmById(filmId);
     }
 
     private void validationBeforeAddFilm(Film film) {
@@ -117,5 +92,4 @@ public class FilmService {
             }
         }
     }
-
 }

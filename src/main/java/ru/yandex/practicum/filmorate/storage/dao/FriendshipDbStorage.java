@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.dao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -11,6 +12,8 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.String.format;
 
 @Component
 @RequiredArgsConstructor
@@ -41,7 +44,12 @@ public class FriendshipDbStorage {
 
     public List<User> getAllFriendsById(long userId) {
         String sql = "SELECT * FROM Users WHERE user_id IN (SELECT friend_id FROM Friendship WHERE user_id = ?)";
-        return jdbcTemplate.query(sql, new UserMapper(), userId);
+        try {
+            log.info("Получили список друзей пользователя id={}", userId);
+            return jdbcTemplate.query(sql, new UserMapper(), userId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NullPointerException(format("Пользователя с id= %s нет в базе", userId));
+        }
     }
 
     public List<User> getCommonFriends(long userId, long friendId) {
@@ -53,6 +61,7 @@ public class FriendshipDbStorage {
                 commonFriends.add(user);
             }
         }
+        log.info("Получили список общих друзей пользователей id={} и id={}", userId, friendId);
         return commonFriends;
     }
 }

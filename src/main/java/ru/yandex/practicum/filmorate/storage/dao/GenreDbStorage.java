@@ -2,12 +2,15 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.mapper.GenreMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
+
+import static java.lang.String.format;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +26,11 @@ public class GenreDbStorage {
 
     public Genre getGenreById(int genreId) {
         String sql = "SELECT * FROM Genre WHERE genre_id = ?";
-        return jdbcTemplate.queryForObject(sql, new GenreMapper(), genreId);
+        try {
+            return jdbcTemplate.queryForObject(sql, new GenreMapper(), genreId);
+        } catch (EmptyResultDataAccessException e) {
+            log.debug("Жанр с id = {} не найден", genreId);
+            throw new NullPointerException(format("Жанр с id = %s не найден", genreId));
+        }
     }
 }

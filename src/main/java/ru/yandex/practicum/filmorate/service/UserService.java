@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -36,9 +35,8 @@ public class UserService {
     }
 
     public User getUserById(long id) {
-        validateUserById(id);
-        log.info("Нашли пользователя с id = {}", id);
         User user = userStorage.getUserById(id);
+        log.info("Нашли пользователя с id = {}", id);
         Set<Long> usersFriends = user.getFriends();
         usersFriends.addAll(friendshipDbStorage.getAllFriendsById(user.getId()).stream().map(User::getId)
                 .collect(Collectors.toSet()));
@@ -65,17 +63,9 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-        try {
-            validateUserById(user.getId());
-            Set<Long> userFriends = user.getFriends();
-            for (Long friendsId : userFriends) {
-                validateUserById(user.getId());
-                addFriend(user.getId(), friendsId);
-            }
-        } catch (EmptyResultDataAccessException e) {
-            log.error("Пользователя с id=" + user.getId() + " не существует");
-            throw new ValidationException(format("Пользователя с id = %s еще не существует", user.getId()));
-        }
+        userStorage.getUserById(user.getId());
+        Set<Long> userFriends = user.getFriends();
+        userFriends.forEach(friendsId -> addFriend(user.getId(), friendsId));
         log.info("Обновили пользователя с id = {}", user.getId());
         return userStorage.updateUser(user);
     }
@@ -129,30 +119,11 @@ public class UserService {
     }
 
     public Collection<User> getFriendsById(long userId) {
-        if (userStorage.getUserById(userId) == null) {
-            log.error("Пользователя с id={} не существует", userId);
-            throw new ValidationException(format("Пользователя с id = %s не существует", userId));
-        }
-        log.info("Получили список друзей пользователя id={}", userId);
         return friendshipDbStorage.getAllFriendsById(userId);
     }
 
     public Collection<User> getCommonFriends(long userId, long friendId) {
-        userStorage.getUserById(userId);
-        userStorage.getUserById(friendId);
-        log.info("Получили список общих друзей пользователей id={} и id={}", userId, friendId);
         return friendshipDbStorage.getCommonFriends(userId, friendId);
-    }
-
-    private void validateUserById(long userId) {
-        try {
-            if (userStorage.getUserById(userId) == null) {
-                log.error("Пользователя с id={} не существует", userId);
-                throw new NullPointerException(format("Пользователя с id= %s нет в базе", userId));
-            }
-        } catch (EmptyResultDataAccessException e) {
-            throw new NullPointerException(format("Пользователя с id= %s нет в базе", userId));
-        }
     }
 
     private void validateBeforeAdd(User user) {
@@ -175,5 +146,4 @@ public class UserService {
             }
         }
     }
-
 }
