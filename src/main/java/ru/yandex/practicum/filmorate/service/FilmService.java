@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.dao.LikesDbStorage;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import static java.lang.String.format;
 public class FilmService {
 
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
     private final LikesDbStorage likesDbStorage;
     private static final LocalDate FIRST_FILM_RELEASE = LocalDate.of(1895, 12, 28);
 
@@ -53,13 +55,14 @@ public class FilmService {
 
     public void addLikes(long filmId, long userId) {
         validateFilmById(filmId);
+        validateUSerById(userId);
         log.info("Пользователь id={} поставил лайк фильму id={}", userId, filmId);
         likesDbStorage.addLikeToFilm(filmId, userId);
     }
 
     public void deleteLikes(long filmId, long userId) {
         validateFilmById(filmId);
-        validateFilmById(userId);
+        validateUSerById(userId);
         log.info("Пользователь id = {} удалил лайк у фильма id = {}", userId, filmId);
         likesDbStorage.deleteLikeFromFilm(filmId, userId);
     }
@@ -74,6 +77,10 @@ public class FilmService {
 
     private void validateFilmById(long filmId) {
         filmStorage.getFilmById(filmId);
+    }
+
+    private void validateUSerById(long userId) {
+        userStorage.getUserById(userId);
     }
 
     private void validationBeforeAddFilm(Film film) {
