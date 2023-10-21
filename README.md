@@ -1,5 +1,15 @@
 # java-filmorate
 
+FilmRate  - a community for rating and recommending movies.
+
+Technology Stack: Java, Spring Boot, Maven, Lombok, SQL, PostgreSQL, H2, JdbcTemplate, JUnit.
+
+About the Project: This is a RESTful web-service capable of storing data in memory or in a database. CRUD and other database queries are manually written. The retrieved data is processed using RowMapper.
+
+Key Functionality: • User registration and retrieval • Adding users to the friends list • Adding, updating, and deleting movies • Searching for movies by title and director • Adding user reviews for movies
+
+How to Use: Run FilmorateApplication.
+
 # Схема базы данных
 ![схема базы данных](src/main/resources/schema.png)
 
